@@ -1,12 +1,12 @@
 # Scrapy を使った Webスクレイピング
 
-[![Bright Data Promo](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.jp/)
+[![Bright Data Promo](https://github.com/bright-jp/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.jp/)
 
 このガイドでは、Webスクレイピングの実用的な適用例として、保護者によくある課題である「学校から送られてくる情報の収集と整理」に取り組みます。具体的には、宿題の詳細と給食（食事）メニューの収集に焦点を当てます。
 
 以下は、構築するものの全体アーキテクチャを示す図です。
 
-![Diagram of the final project](https://github.com/luminati-io/scrapy-web-scraping/blob/main/images/diagram-of-the-final-project.png)
+![Diagram of the final project](https://github.com/bright-jp/scrapy-web-scraping/blob/main/images/diagram-of-the-final-project.png)
 
 計画は次のとおりです。
 
@@ -70,7 +70,7 @@ school-scraper
 
 宿題情報を収集するには、学校システムへログインし、宿題課題ページへ移動する Spider が必要です。
 
-![diagram showing the process of creating a spider and navigating to scrape the data](https://github.com/luminati-io/scrapy-web-scraping/blob/main/images/diagram-showing-the-process-of-creating-a-spider-and-navigating-to-scrape-the-data.png)
+![diagram showing the process of creating a spider and navigating to scrape the data](https://github.com/bright-jp/scrapy-web-scraping/blob/main/images/diagram-showing-the-process-of-creating-a-spider-and-navigating-to-scrape-the-data.png)
 
 Scrapy CLI を使って Spider を生成します。`school-scraper/school_scraper` ディレクトリから次を実行してください。
 
