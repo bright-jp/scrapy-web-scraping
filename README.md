@@ -1,48 +1,48 @@
-# Web Scraping With Scrapy
+# Scrapy を使った Webスクレイピング
 
-[![Bright Data Promo](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.com/)
+[![Bright Data Promo](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://brightdata.jp/)
 
-This guide demonstrates a practical application of web scraping to address a common parental challenge: collecting and organizing information sent from schools. We'll focus specifically on gathering homework details and lunch menus.
+このガイドでは、Webスクレイピングの実用的な適用例として、保護者によくある課題である「学校から送られてくる情報の収集と整理」に取り組みます。具体的には、宿題の詳細と給食（食事）メニューの収集に焦点を当てます。
 
-Here's a diagram showing the overall architecture of what we're building:
+以下は、構築するものの全体アーキテクチャを示す図です。
 
 ![Diagram of the final project](https://github.com/luminati-io/scrapy-web-scraping/blob/main/images/diagram-of-the-final-project.png)
 
-Here is the plan:
+計画は次のとおりです。
 
-- [Set Up the Project](#setting-up-the-project)
-- [Develop the Homework Spider](#developing-the-homework-spider)
-- [Develop the Meal Spider](#developing-the-meal-spider)
-- [Format the Data](#data-formatting)
-- [Handle Web Scraping Challenges](#handling-web-scraping-challenges)
+- [プロジェクトのセットアップ](#setting-up-the-project)
+- [宿題 Spider の開発](#developing-the-homework-spider)
+- [食事 Spider の開発](#developing-the-meal-spider)
+- [データの整形](#data-formatting)
+- [Webスクレイピングの課題への対応](#handling-web-scraping-challenges)
 
-## Requirements
+## 要件
 
-Before starting this tutorial, ensure you have:
+このチュートリアルを開始する前に、次のものが揃っていることを確認してください。
 
-- [Python 3.10+](https://www.python.org/downloads/) installed
-- An [activated Python virtual environment](https://docs.python.org/3/library/venv.html)
-- [Scrapy 2.11.1+](https://docs.scrapy.org/en/latest/intro/install.html#intro-install) installed via pip
-- A code editor (like [VS Code](https://code.visualstudio.com/) or [PyCharm](https://www.jetbrains.com/pycharm/))
+- [Python 3.10+](https://www.python.org/downloads/) がインストールされていること
+- [有効化された Python 仮想環境](https://docs.python.org/3/library/venv.html)
+- pip 経由で [Scrapy 2.11.1+](https://docs.scrapy.org/en/latest/intro/install.html#intro-install) がインストールされていること
+- コードエディタ（[VS Code](https://code.visualstudio.com/) や [PyCharm](https://www.jetbrains.com/pycharm/) など）
 
-For privacy purposes, we'll be working with this demonstration school website: [https://systemcraftsman.github.io/scrapy-demo/website/](https://systemcraftsman.github.io/scrapy-demo/website/)
+プライバシーの観点から、このデモ用学校 Web サイトを使用します: [https://systemcraftsman.github.io/scrapy-demo/website/](https://systemcraftsman.github.io/scrapy-demo/website/)
 
 ## Setting Up the Project
 
-First, create your project directory:
+まず、プロジェクトディレクトリを作成します。
 
 ```sh
 mkdir school-scraper
 ```
 
-Navigate to this directory and initialize a new Scrapy project:
+このディレクトリへ移動し、新しい Scrapy プロジェクトを初期化します。
 
 ```sh
 cd school-scraper & \
 scrapy startproject school_scraper
 ```
 
-This generates a folder structure like:
+これにより、次のようなフォルダ構成が生成されます。
 
 ```
 school-scraper
@@ -58,36 +58,36 @@ school-scraper
     └── scrapy.cfg
 ```
 
-The command creates two nested `school_scraper` directories. In the inner directory, Scrapy generates several key files:
-- `middlewares.py` for defining Scrapy [middlewares](https://docs.scrapy.org/en/latest/topics/spider-middleware.html)
-- `pipelines.py` for creating custom data processing pipelines
-- `settings.py` for configuring your scraping application
-- A `spiders` folder where you'll place your spider classes
+このコマンドは、`school_scraper` ディレクトリを 2 重に作成します。内側のディレクトリでは、Scrapy がいくつかの重要ファイルを生成します。
+- Scrapy の [middlewares](https://docs.scrapy.org/en/latest/topics/spider-middleware.html) を定義するための `middlewares.py`
+- カスタムデータ処理パイプラインを作成するための `pipelines.py`
+- スクレイピングアプリケーションを設定するための `settings.py`
+- Spider クラスを配置する `spiders` フォルダ
 
-Currently, the `spiders` folder is empty, but we'll populate it next.
+現在、`spiders` フォルダは空ですが、次にここへ追加していきます。
 
 ## Developing the Homework Spider
 
-To gather homework information, we need a spider that logs into the school system and navigates to the homework assignments page:
+宿題情報を収集するには、学校システムへログインし、宿題課題ページへ移動する Spider が必要です。
 
 ![diagram showing the process of creating a spider and navigating to scrape the data](https://github.com/luminati-io/scrapy-web-scraping/blob/main/images/diagram-showing-the-process-of-creating-a-spider-and-navigating-to-scrape-the-data.png)
 
-Use the Scrapy CLI to generate a spider. From the `school-scraper/school_scraper` directory, run:
+Scrapy CLI を使って Spider を生成します。`school-scraper/school_scraper` ディレクトリから次を実行してください。
 
 ```sh
 scrapy genspider homework_spider systemcraftsman.github.io/scrapy-demo/website/index.html
 ```
 
-> **REMINDER:** Ensure you run all Python and Scrapy commands within your activated virtual environment.
+> **REMINDER:** すべての Python および Scrapy コマンドは、有効化した仮想環境内で実行してください。
 
-You should see output like:
+次のような出力が表示されるはずです。
 
 ```
 Created spider 'homework_spider' using template 'basic' in module:
   school_scraper.spiders.homework_spider
 ```
 
-This creates `homework_spider.py` in the `school_scraper/spiders` directory with this content:
+これにより、`school_scraper/spiders` ディレクトリに `homework_spider.py` が作成され、内容は次のようになります。
 
 ```python
 class HomeworkSpiderSpider(scrapy.Spider):
@@ -99,13 +99,13 @@ class HomeworkSpiderSpider(scrapy.Spider):
         pass
 ```
 
-Rename the class to `HomeworkSpider` to remove the redundant `Spider` in the name. The `parse` method is our entry point for scraping, which we'll use for logging in.
+クラス名を `HomeworkSpider` に変更して、名前に含まれる冗長な `Spider` を削除してください。`parse` メソッドはスクレイピングのエントリポイントで、ログインに使用します。
 
 > **NOTE:**
 > 
-> The login form at `https://systemcraftsman.github.io/scrapy-demo/index.html` is simulated with JavaScript. Since it's a static HTML page, we'll use an HTTP GET request to simulate the login process.
+> `https://systemcraftsman.github.io/scrapy-demo/index.html` のログインフォームは JavaScript でシミュレートされています。静的な HTML ページであるため、HTTP GET リクエストを使用してログインプロセスをシミュレートします。
 
-Update the `parse` method like this:
+`parse` メソッドを次のように更新します。
 
 ```python
 ...code omitted...
@@ -116,9 +116,9 @@ Update the `parse` method like this:
                            callback=self.after_login)
 ```
 
-This submits a form request to log in, which redirects to our `welcome_page_url` with the `after_login` callback to continue scraping.
+これにより、ログインするためのフォームリクエストが送信され、`after_login` コールバックを伴って `welcome_page_url` へリダイレクトされ、スクレイピングを継続します。
 
-Add the `welcome_page_url` to the class variables:
+クラス変数に `welcome_page_url` を追加します。
 
 ```python
 ...code omitted...
@@ -127,7 +127,7 @@ Add the `welcome_page_url` to the class variables:
 ...code omitted...
 ```
 
-Next, add the `after_login` method after the `parse` method:
+次に、`parse` メソッドの後に `after_login` メソッドを追加します。
 
 ```python
 ...code omitted...
@@ -139,9 +139,9 @@ Next, add the `after_login` method after the `parse` method:
 ...code omitted...
 ```
 
-This method checks for a successful response (status 200), then navigates to the homework page and calls our `parse_homework_page` method.
+このメソッドはレスポンスが成功（ステータス 200）かどうかを確認し、その後宿題ページへ移動して `parse_homework_page` メソッドを呼び出します。
 
-Add the `homework_page_url` to the class variables:
+クラス変数に `homework_page_url` を追加します。
 
 ```python
 ...code omitted...
@@ -151,7 +151,7 @@ Add the `homework_page_url` to the class variables:
 ...code omitted...
 ```
 
-Now add the `parse_homework_page` method after `after_login`:
+次に、`after_login` の後に `parse_homework_page` メソッドを追加します。
 
 ```python
 ...code omitted...
@@ -169,9 +169,9 @@ Now add the `parse_homework_page` method after `after_login`:
 ...code omitted...
 ```
 
-This method verifies the response status is 200, then extracts homework data from an HTML table. It uses XPath to retrieve rows, then extracts specific data points with our helper method `_get_item`.
+このメソッドはレスポンスステータスが 200 であることを確認し、HTML テーブルから宿題データを抽出します。XPath を使用して行を取得し、ヘルパーメソッド `_get_item` で特定のデータを抽出します。
 
-Add the `_get_item` helper method to your class:
+クラスに `_get_item` ヘルパーメソッドを追加します。
 
 ```python
 ...code omitted...
@@ -183,15 +183,15 @@ Add the `_get_item` helper method to your class:
         return item_str
 ```
 
-This helper method extracts cell content using XPath with row and column indices. If a cell contains multiple text nodes, it concatenates them.
+このヘルパーメソッドは、行と列のインデックスを用いた XPath でセル内容を抽出します。セル内に複数のテキストノードがある場合は、それらを連結します。
 
-The `parse_homework_page` method also needs a `date_str` variable. We'll set it to `12.03.2024` to match our static demo site data:
+また、`parse_homework_page` メソッドには `date_str` 変数が必要です。静的なデモサイトのデータに合わせて `12.03.2024` に設定します。
 
 > **NOTE:**
 > 
-> In a real application, you'd likely generate this date dynamically.
+> 実際のアプリケーションでは、この日付を動的に生成するのが一般的です。
 
-Add the `date_str` to the class variables:
+クラス変数に `date_str` を追加します。
 
 ```python
 ...code omitted...
@@ -200,7 +200,7 @@ Add the `date_str` to the class variables:
 ...code omitted...
 ```
 
-Your completed `homework_spider.py` should now look like this:
+これで、完成した `homework_spider.py` は次のようになります。
 
 ```python
 import scrapy
@@ -248,13 +248,13 @@ class HomeworkSpider(scrapy.Spider):
         return item_str
 ```
 
-Test your spider by running:
+次を実行して Spider をテストします。
 
 ```
 scrapy crawl homework_spider
 ```
 
-You should see output similar to:
+次のような出力が表示されるはずです。
 
 ```
 ...output omitted...
@@ -266,13 +266,13 @@ You should see output similar to:
 
 ## Developing the Meal Spider
 
-Create another spider for the meal list page:
+食事リストページ用に別の Spider を作成します。
 
 ```sh
 scrapy genspider meal_spider systemcraftsman.github.io/scrapy-demo/website/index.html
 ```
 
-This generates a new file with:
+これにより、次の内容の新しいファイルが生成されます。
 
 ```python
 class MealSpiderSpider(scrapy.Spider):
@@ -284,9 +284,9 @@ class MealSpiderSpider(scrapy.Spider):
         pass
 ```
 
-The meal spider follows a similar pattern to the homework spider, with the main difference being the HTML parsing logic.
+食事 Spider は宿題 Spider と同様のパターンに従いますが、主な違いは HTML のパースロジックです。
 
-Replace the contents of `meal_spider.py` with:
+`meal_spider.py` の内容を次に置き換えてください。
 
 ```python
 import scrapy
@@ -339,15 +339,15 @@ class MealSpider(scrapy.Spider):
         return item_str
 ```
 
-Note that the `parse` and `after_login` methods are nearly identical to those in the homework spider. The main difference is in the `parse_meal_page` method, which extracts meal information using different XPath expressions and data handling logic.
+`parse` と `after_login` メソッドは宿題 Spider のものとほぼ同一である点に注意してください。主な違いは `parse_meal_page` メソッドにあり、異なる XPath 式とデータ処理ロジックを使用して食事情報を抽出します。
 
-Test your meal spider with:
+次で食事 Spider をテストします。
 
 ```sh
 scrapy crawl meal_spider
 ```
 
-You should see:
+次のように表示されるはずです。
 
 ```
 ...output omitted...
@@ -359,11 +359,11 @@ You should see:
 
 ## Data Formatting
 
-Now that your spiders can extract data in JSON format, you may want to format it more nicely by programmatically triggering the spiders.
+Spider で JSON 形式のデータを抽出できるようになったので、Spider をプログラムから実行して、より見やすく整形したくなるかもしれません。
 
-While Scrapy projects typically don't require a `main.py` entry point (since the Scrapy CLI provides the framework for running spiders), we'll create one to format our output data.
+通常、Scrapy プロジェクトでは `main.py` のようなエントリポイントは不要です（Scrapy CLI が Spider 実行の枠組みを提供するため）が、出力データを整形するために作成します。
 
-Create a file named `main.py` in the root directory of your `school-scraper` project with:
+`school-scraper` プロジェクトのルートディレクトリに `main.py` という名前のファイルを作成し、次を記述します。
 
 ```python
 import sys
@@ -414,19 +414,19 @@ if __name__ == "__main__":
     main()
 ```
 
-This script provides an entry point for your application. The `main` function processes command line arguments to determine which spider to run.
+このスクリプトはアプリケーションのエントリポイントを提供します。`main` 関数はコマンドライン引数を処理して、どの Spider を実行するかを決定します。
 
-It configures a custom `ResultsPipeline` that collects the spider's output into the `results` array. The `_prepare_message` helper function formats this data for display.
+Spider の出力を `results` 配列に収集するカスタム `ResultsPipeline` を設定します。`_prepare_message` ヘルパー関数は、表示用にこのデータを整形します。
 
-Based on the argument provided (either "homework" or "meal"), the script runs the appropriate spider and formats its output.
+渡された引数（"homework" または "meal"）に応じて、スクリプトは適切な Spider を実行し、その出力を整形します。
 
-Run it to get homework assignments:
+宿題課題を取得するには次を実行します。
 
 ```sh
 python main.py homework
 ```
 
-You should see:
+次のように表示されるはずです。
 
 ```
 ...output omitted...
@@ -445,13 +445,13 @@ Reading Log kitabınızın 100-107 sayfalarındaki "Manny and His Monster Manner
 ...output omitted...
 ```
 
-For the meal list:
+食事リストの場合は次です。
 
 ```sh
 python main.py meal
 ```
 
-Output:
+出力:
 
 ```
 ...output omitted...
@@ -488,34 +488,34 @@ FINDIK& KURU ÜZÜM
 
 ## Handling Web Scraping Challenges
 
-While Scrapy makes web scraping relatively straightforward, you might encounter various challenges in real-world applications. Here are some tips for handling common obstacles:
+Scrapy により Webスクレイピングは比較的簡単になりますが、実運用のアプリケーションではさまざまな課題に直面することがあります。ここでは、一般的な障害に対処するためのヒントを紹介します。
 
 ### Dynamic Websites
 
-Dynamic websites deliver different content to users based on factors like location, device, or preferences. While Scrapy can handle dynamic websites, it's not specifically designed for this purpose.
+Dynamic な Web サイトは、場所、デバイス、または設定などの要因に基づいて、ユーザーに異なるコンテンツを提供します。Scrapy でも Dynamic な Web サイトを扱えますが、この目的に特化して設計されているわけではありません。
 
-For dynamic content, consider scheduling your Scrapy spiders to run regularly and implementing a system to track changes over time. In some cases, you may be able to treat infrequently updated dynamic content as essentially static.
+Dynamic なコンテンツの場合は、Scrapy Spider を定期的に実行するようスケジューリングし、時間経過に伴う変更を追跡する仕組みを実装することを検討してください。場合によっては、更新頻度が低い Dynamic なコンテンツを、実質的に静的コンテンツとして扱えることもあります。
 
 ### CAPTCHAs
 
-[CAPTCHAs](https://brightdata.com/blog/web-data/what-is-a-captcha) are security mechanisms that display distorted text or images that humans must identify to proceed. They're specifically designed to block automated scraping tools.
+[CAPTCHAs](https://brightdata.jp/blog/web-data/what-is-a-captcha) は、歪んだテキストや画像を表示し、人間が識別して進む必要があるセキュリティ機構です。自動化されたスクレイピングツールをブロックするために特別に設計されています。
 
-While our example doesn't use CAPTCHAs, you might encounter them in real-world applications. One approach is to create a Scrapy middleware that downloads the CAPTCHA image and uses OCR (Optical Character Recognition) libraries to convert it to text.
+この例では CAPTCHA は使用していませんが、実運用では遭遇する可能性があります。1 つのアプローチとして、CAPTCHA 画像をダウンロードし、OCR（Optical Character Recognition）ライブラリでテキストに変換する Scrapy middleware を作成する方法があります。
 
 ### Session and Cookie Management
 
-Web applications use sessions to maintain state information about users as they navigate through the site. Cookies store information on the user's device that the website can access during subsequent visits.
+Web アプリケーションは、ユーザーがサイト内を移動する際の状態情報を維持するためにセッションを使用します。Cookie はユーザーの端末に情報を保存し、Web サイトが後続の訪問時に参照できるようにします。
 
-You may need to maintain session state or manipulate cookies during scraping. Scrapy has built-in support for handling cookies and session management, and additional capabilities are available through third-party libraries.
+スクレイピング中にセッション状態を維持したり、Cookie を操作したりする必要がある場合があります。Scrapy には Cookie 処理とセッション管理のための組み込みサポートがあり、サードパーティライブラリを通じて追加機能も利用できます。
 
 ### IP Blocking
 
-Many websites implement [IP blocking](https://brightdata.com/blog/proxy-101/how-to-bypass-an-ip-ban) to prevent excessive requests from a single source. If a site detects unusual patterns of requests (like those from a scraping bot), it may temporarily or permanently block your IP address.
+多くの Web サイトは、単一の送信元からの過剰なリクエストを防ぐために [IP blocking](https://brightdata.jp/blog/proxy-101/how-to-bypass-an-ip-ban) を実装しています。サイトが（スクレイピングボットのような）異常なリクエストパターンを検知すると、IPアドレスを一時的または恒久的にブロックすることがあります。
 
-If you encounter IP blocking, consider using [rotating IP addresses](https://brightdata.com/solutions/rotating-proxies) to distribute your requests across multiple IPs.
+IP blocking に遭遇した場合は、複数の IP にリクエストを分散するために [rotating IP addresses](https://brightdata.jp/solutions/rotating-proxies) の利用を検討してください。
 
 ## Summary
 
-For those looking to enhance their web scraping capabilities, Bright Data offers solutions specifically designed for public web data collection. Their [Scrapy integration](https://brightdata.com//integration/scrapy) extends Scrapy's capabilities by using proxy services to help avoid IP bans.
+Webスクレイピング能力を強化したい方に向けて、Bright Data は公開 Web データ収集のために特別に設計されたソリューションを提供しています。同社の [Scrapy integration](https://brightdata.jp//integration/scrapy) は、プロキシサービスを利用して IP ban の回避を支援し、Scrapy の機能を拡張します。
 
-Sign up today to speak with their data experts about your scraping needs.
+本日サインアップして、スクレイピングのニーズについて同社のデータエキスパートにご相談ください。
